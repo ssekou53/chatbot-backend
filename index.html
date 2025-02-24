@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chatbot-container {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .chat-footer {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        .chat-footer input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-bottom-left-radius: 10px;
+        }
+        .chat-footer button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom-right-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button class="chatbot-button" onclick="toggleChatbot()">AI Assistant</button>
+    <div class="chatbot-container" id="chatbot">
+        <div class="chat-header">Chatbot</div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-footer">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        function toggleChatbot() {
+            let chatbot = document.getElementById("chatbot");
+            chatbot.style.display = chatbot.style.display === "none" ? "flex" : "none";
+        }
+        
+        function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            if (userInput.trim() === "") return;
+            
+            let chatBody = document.getElementById("chatBody");
+            let userMessage = `<div><strong>You:</strong> ${userInput}</div>`;
+            chatBody.innerHTML += userMessage;
+            document.getElementById("userInput").value = "";
+            
+            fetch(`/chatbot-response?query=${encodeURIComponent(userInput)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let botMessage = `<div><strong>Bot:</strong> ${data.response}</div>`;
+                    chatBody.innerHTML += botMessage;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                })
+                .catch(error => {
+                    let errorMessage = `<div><strong>Bot:</strong> Sorry, there was an error processing your request.</div>`;
+                    chatBody.innerHTML += errorMessage;
+                });
+        }
+    </script>
+</body>
+</html>
